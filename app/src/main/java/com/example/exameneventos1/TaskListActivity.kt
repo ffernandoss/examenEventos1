@@ -39,6 +39,8 @@ fun TaskListScreen(modifier: Modifier = Modifier) {
     var tareasHechas by remember { mutableStateOf(listOf<String>()) }
     var selectedTask by remember { mutableStateOf<String?>(null) }
     var selectedDoneTask by remember { mutableStateOf<String?>(null) }
+    var showPendingTasks by remember { mutableStateOf(false) }
+    var showDoneTasks by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -62,69 +64,83 @@ fun TaskListScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Lista de tareas pendientes", fontWeight = FontWeight.Bold)
-        LazyColumn {
-            items(tareasPendientes) { tarea ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .clickable {
-                            selectedTask = if (selectedTask == tarea) null else tarea
-                        }
-                ) {
-                    Text(text = tarea, modifier = Modifier.weight(1f))
-                    if (selectedTask == tarea) {
-                        Button(onClick = {
-                            tareasPendientes = tareasPendientes - tarea
-                            tareasHechas = tareasHechas + tarea
-                            selectedTask = null
-                        }) {
-                            Text("Hecha")
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Button(onClick = {
-                            tareasPendientes = tareasPendientes - tarea
-                            selectedTask = null
-                        }) {
-                            Text("Borrar")
+        Row {
+            Button(onClick = { showPendingTasks = !showPendingTasks }) {
+                Text(text = "Pendientes")
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Button(onClick = { showDoneTasks = !showDoneTasks }) {
+                Text(text = "Hechas")
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        if (showPendingTasks) {
+            Text(text = "Lista de tareas pendientes", fontWeight = FontWeight.Bold)
+            LazyColumn {
+                items(tareasPendientes) { tarea ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .clickable {
+                                selectedTask = if (selectedTask == tarea) null else tarea
+                            }
+                    ) {
+                        Text(text = tarea, modifier = Modifier.weight(1f))
+                        if (selectedTask == tarea) {
+                            Button(onClick = {
+                                tareasPendientes = tareasPendientes - tarea
+                                tareasHechas = tareasHechas + tarea
+                                selectedTask = null
+                            }) {
+                                Text("Hecha")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(onClick = {
+                                tareasPendientes = tareasPendientes - tarea
+                                selectedTask = null
+                            }) {
+                                Text("Borrar")
+                            }
                         }
                     }
                 }
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Lista de tareas hechas", fontWeight = FontWeight.Bold)
-        LazyColumn {
-            items(tareasHechas) { tarea ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .clickable {
-                            selectedDoneTask = if (selectedDoneTask == tarea) null else tarea
-                        }
-                ) {
-                    Text(
-                        text = tarea,
+        if (showDoneTasks) {
+            Text(text = "Lista de tareas hechas", fontWeight = FontWeight.Bold)
+            LazyColumn {
+                items(tareasHechas) { tarea ->
+                    Row(
                         modifier = Modifier
-                            .weight(1f)
-                            .background(Color.Green)
-                    )
-                    if (selectedDoneTask == tarea) {
-                        Button(onClick = {
-                            tareasHechas = tareasHechas - tarea
-                            tareasPendientes = tareasPendientes + tarea
-                            selectedDoneTask = null
-                        }) {
-                            Text("Deshacer")
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Button(onClick = {
-                            tareasHechas = tareasHechas - tarea
-                            selectedDoneTask = null
-                        }) {
-                            Text("Borrar")
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .clickable {
+                                selectedDoneTask = if (selectedDoneTask == tarea) null else tarea
+                            }
+                    ) {
+                        Text(
+                            text = tarea,
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(Color.Green)
+                        )
+                        if (selectedDoneTask == tarea) {
+                            Button(onClick = {
+                                tareasHechas = tareasHechas - tarea
+                                tareasPendientes = tareasPendientes + tarea
+                                selectedDoneTask = null
+                            }) {
+                                Text("Deshacer")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(onClick = {
+                                tareasHechas = tareasHechas - tarea
+                                selectedDoneTask = null
+                            }) {
+                                Text("Borrar")
+                            }
                         }
                     }
                 }
