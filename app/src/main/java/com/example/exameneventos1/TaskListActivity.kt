@@ -23,10 +23,12 @@ class TaskListActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // Obtiene el idioma seleccionado de la intención
         val language = intent.getStringExtra("LANGUAGE") ?: "es"
         setContent {
             ExamenEventos1Theme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    // Pasa el idioma seleccionado a la pantalla de la lista de tareas
                     TaskListScreen(modifier = Modifier.padding(innerPadding), language = language)
                 }
             }
@@ -36,6 +38,7 @@ class TaskListActivity : ComponentActivity() {
 
 @Composable
 fun TaskListScreen(modifier: Modifier = Modifier, language: String) {
+    // Variables de estado para gestionar las tareas y la interfaz de usuario
     var taskName by remember { mutableStateOf("") }
     var tareasPendientes by remember { mutableStateOf(listOf<String>()) }
     var tareasHechas by remember { mutableStateOf(listOf<String>()) }
@@ -50,6 +53,7 @@ fun TaskListScreen(modifier: Modifier = Modifier, language: String) {
             .padding(16.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
+        // Botón para añadir una nueva tarea
         Button(onClick = {
             if (taskName.isNotBlank()) {
                 tareasPendientes = tareasPendientes + taskName
@@ -59,6 +63,7 @@ fun TaskListScreen(modifier: Modifier = Modifier, language: String) {
             Text(text = if (language == "es") "Añadir tarea" else "Add task")
         }
         Spacer(modifier = Modifier.height(16.dp))
+        // Campo de texto para ingresar el nombre de la tarea
         TextField(
             value = taskName,
             onValueChange = { taskName = it },
@@ -67,15 +72,18 @@ fun TaskListScreen(modifier: Modifier = Modifier, language: String) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Row {
+            // Botón para mostrar/ocultar las tareas pendientes
             Button(onClick = { showPendingTasks = !showPendingTasks }) {
                 Text(text = if (language == "es") "Pendientes" else "Pending")
             }
             Spacer(modifier = Modifier.width(8.dp))
+            // Botón para mostrar/ocultar las tareas hechas
             Button(onClick = { showDoneTasks = !showDoneTasks }) {
                 Text(text = if (language == "es") "Hechas" else "Done")
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
+        // Lista de tareas pendientes
         if (showPendingTasks) {
             Text(text = if (language == "es") "Lista de tareas pendientes" else "Pending tasks list", fontWeight = FontWeight.Bold)
             LazyColumn {
@@ -90,6 +98,7 @@ fun TaskListScreen(modifier: Modifier = Modifier, language: String) {
                     ) {
                         Text(text = tarea, modifier = Modifier.weight(1f))
                         if (selectedTask == tarea) {
+                            // Botón para marcar la tarea como hecha
                             Button(onClick = {
                                 tareasPendientes = tareasPendientes - tarea
                                 tareasHechas = tareasHechas + tarea
@@ -98,6 +107,7 @@ fun TaskListScreen(modifier: Modifier = Modifier, language: String) {
                                 Text(if (language == "es") "Hecha" else "Done")
                             }
                             Spacer(modifier = Modifier.width(8.dp))
+                            // Botón para borrar la tarea
                             Button(onClick = {
                                 tareasPendientes = tareasPendientes - tarea
                                 selectedTask = null
@@ -110,6 +120,7 @@ fun TaskListScreen(modifier: Modifier = Modifier, language: String) {
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
+        // Lista de tareas hechas
         if (showDoneTasks) {
             Text(text = if (language == "es") "Lista de tareas hechas" else "Done tasks list", fontWeight = FontWeight.Bold)
             LazyColumn {
@@ -129,6 +140,7 @@ fun TaskListScreen(modifier: Modifier = Modifier, language: String) {
                                 .background(Color.Green)
                         )
                         if (selectedDoneTask == tarea) {
+                            // Botón para deshacer la tarea hecha
                             Button(onClick = {
                                 tareasHechas = tareasHechas - tarea
                                 tareasPendientes = tareasPendientes + tarea
@@ -137,6 +149,7 @@ fun TaskListScreen(modifier: Modifier = Modifier, language: String) {
                                 Text(if (language == "es") "Deshacer" else "Undo")
                             }
                             Spacer(modifier = Modifier.width(8.dp))
+                            // Botón para borrar la tarea hecha
                             Button(onClick = {
                                 tareasHechas = tareasHechas - tarea
                                 selectedDoneTask = null
