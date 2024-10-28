@@ -5,9 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,14 +33,37 @@ class TaskListActivity : ComponentActivity() {
 
 @Composable
 fun TaskListScreen(modifier: Modifier = Modifier) {
+    var taskName by remember { mutableStateOf("") }
+    var tareasPendientes by remember { mutableStateOf(listOf<String>()) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Center
     ) {
+        TextField(
+            value = taskName,
+            onValueChange = { taskName = it },
+            label = { Text("Nombre de la tarea") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = {
+            if (taskName.isNotBlank()) {
+                tareasPendientes = tareasPendientes + taskName
+                taskName = ""
+            }
+        }) {
+            Text(text = "Añadir tarea")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
         Text(text = "Lista de tareas")
-        // Aquí puedes agregar más contenido relacionado con la lista de tareas
+        LazyColumn {
+            items(tareasPendientes) { tarea ->
+                Text(text = tarea)
+            }
+        }
     }
 }
 
