@@ -1,38 +1,23 @@
 package com.example.exameneventos1.ejercicio3
 
+import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import android.app.DatePickerDialog
-import java.util.Calendar
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.exameneventos1.ui.theme.ExamenEventos1Theme
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.util.Calendar
 
-// Actividad para mostrar la lista del tema 3
-class TareasEjercicio3Activity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            ExamenEventos1Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    // Llama a la función composable para la pantalla de tareas del ejercicio 3
-                    TareasEjercicio3Screen(modifier = Modifier.padding(innerPadding))
-                }
-            }
-        }
-    }
-}
-
-// Clase de datos para representar una tarea
 data class Tarea(
     val nombre: String,
     val descripcion: String,
@@ -41,16 +26,31 @@ data class Tarea(
     val prioridad: Boolean
 )
 
-// Función composable para la pantalla de tareas del ejercicio 3
+class TareasEjercicio3Activity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            ExamenEventos1Theme {
+                TareasEjercicio3Screen(onShowTasksClick = { listaTareas ->
+                    val intent = Intent(this, MostrarTareasActivity::class.java)
+                    val nombresTareas = listaTareas.map { it.nombre }
+                    intent.putStringArrayListExtra("NOMBRES_TAREAS", ArrayList(nombresTareas))
+                    startActivity(intent)
+                })
+            }
+        }
+    }
+}
+
 @Composable
-fun TareasEjercicio3Screen(modifier: Modifier = Modifier) {
+fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (List<Tarea>) -> Unit) {
     var nombre by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var fecha by remember { mutableStateOf("") }
     var coste by remember { mutableStateOf("") }
     var prioridad by remember { mutableStateOf(false) }
-    var listaTareas by remember { mutableStateOf(listOf<Tarea>()) }
     val context = LocalContext.current
+    val listaTareas = remember { mutableStateOf(loadTareas(context)) }
     var showToast by remember { mutableStateOf(false) }
     var toastMessage by remember { mutableStateOf("") }
 
@@ -148,7 +148,8 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier) {
                 }
                 else -> {
                     val nuevaTarea = Tarea(nombre, descripcion, fecha, coste.toDouble(), prioridad)
-                    listaTareas = listaTareas + nuevaTarea
+                    listaTareas.value = listaTareas.value + nuevaTarea
+                    saveTareas(context, listaTareas.value)
                     nombre = ""
                     descripcion = ""
                     fecha = ""
@@ -160,19 +161,33 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier) {
             Text("Añadir")
         }
         Spacer(modifier = Modifier.height(16.dp))
-        LazyColumn {
-            items(listaTareas) { tarea ->
-                Text(text = "${tarea.nombre} - ${tarea.descripcion} - ${tarea.fecha} - ${tarea.coste} - ${if (tarea.prioridad) "Alta" else "Baja"}")
-            }
+        Button(onClick = { onShowTasksClick(listaTareas.value) }) {
+            Text("Mostrar todas las tareas")
         }
     }
 }
-// Función de vista previa para la pantalla de tareas del ejercicio 3
+
+fun saveTareas(context: android.content.Context, listaTareas: List<Tarea>) {
+    val sharedPreferences = context.getSharedPreferences("TareasPrefs", android.content.Context.MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+    val gson = Gson()
+    val json = gson.toJson(listaTareas)
+    editor.putString("TareasList", json)
+    editor.apply()
+}
+
+fun loadTareas(context: android.content.Context): List<Tarea> {
+    val sharedPreferences = context.getSharedPreferences("TareasPrefs", android.content.Context.MODE_PRIVATE)
+    val gson = Gson()
+    val json = sharedPreferences.getString("TareasList", null)
+    val type = object : TypeToken<List<Tarea>>() {}.type
+    return if (json != null) gson.fromJson(json, type) else listOf()
+}
+
 @Preview(showBackground = true)
 @Composable
 fun TareasEjercicio3ScreenPreview() {
     ExamenEventos1Theme {
-        // Vista previa de la pantalla de tareas del ejercicio 3
-        TareasEjercicio3Screen()
+        TareasEjercicio3Screen(onShowTasksClick = {})
     }
 }

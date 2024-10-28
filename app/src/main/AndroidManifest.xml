@@ -52,11 +52,15 @@
             android:theme="@style/Theme.ExamenEventos1" />
 
         <activity
+            android:name=".ejercicio3.MostrarTareasActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.ExamenEventos1" />
+        <activity
             android:name=".ejercicio3.TareasEjercicio3Activity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.ExamenEventos1" />
-
     </application>
 
 </manifest>
