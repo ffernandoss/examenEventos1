@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.exameneventos1.ui.theme.ExamenEventos1Theme
 
+// Actividad principal para la lista de compras
 class ListaCompraActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,8 +29,10 @@ class ListaCompraActivity : ComponentActivity() {
     }
 }
 
+// Función composable para la pantalla de la lista de compras
 @Composable
 fun ListaCompraScreen(modifier: Modifier = Modifier) {
+    // Variables de estado para los campos de entrada y la lista de compras
     var producto by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
     var precio by remember { mutableStateOf("") }
@@ -39,6 +42,7 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
     var showToast by remember { mutableStateOf(false) }
     var toastMessage by remember { mutableStateOf("") }
 
+    // Mostrar un Toast si showToast es verdadero
     if (showToast) {
         LaunchedEffect(Unit) {
             Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
@@ -46,21 +50,25 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
         }
     }
 
+    // Función para verificar si un valor es numérico
     fun isNumeric(value: String): Boolean {
         return value.toDoubleOrNull() != null
     }
 
+    // Función para calcular el precio total de la lista de compras
     fun calcularPrecioTotal(): Double {
         return listaCompra.filter { it.precio.isNotBlank() }
             .sumOf { (it.cantidad.ifBlank { "1" }.toDouble()) * it.precio.toDouble() }
     }
 
+    // Estructura de la interfaz de usuario
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Top
     ) {
+        // Campo de texto para el nombre del producto
         TextField(
             value = producto,
             onValueChange = { producto = it },
@@ -68,6 +76,7 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
+        // Campo de texto para la cantidad del producto
         TextField(
             value = cantidad,
             onValueChange = { cantidad = it },
@@ -75,6 +84,7 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
+        // Campo de texto para el precio del producto
         TextField(
             value = precio,
             onValueChange = { precio = it },
@@ -82,6 +92,7 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
+        // Botón para añadir un producto a la lista de compras
         Button(onClick = {
             when {
                 producto.isBlank() -> {
@@ -112,6 +123,7 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
             Text("Añadir")
         }
         Spacer(modifier = Modifier.height(16.dp))
+        // Campo de texto para el nombre del producto a eliminar
         TextField(
             value = productoAEliminar,
             onValueChange = { productoAEliminar = it },
@@ -119,6 +131,7 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
+        // Botón para eliminar un producto de la lista de compras
         Button(onClick = {
             val productoEncontrado = listaCompra.find { it.producto == productoAEliminar }
             if (productoEncontrado != null) {
@@ -133,18 +146,22 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
             Text("Eliminar")
         }
         Spacer(modifier = Modifier.height(16.dp))
+        // Lista de productos en la lista de compras
         LazyColumn {
             items(listaCompra) { item ->
                 Text(text = "${item.producto} - ${item.cantidad.ifBlank { "1" }} - ${item.precio}")
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
+        // Mostrar el precio total de la lista de compras
         Text(text = "Precio total: ${calcularPrecioTotal()}")
     }
 }
 
+// Clase de datos para representar un producto
 data class Producto(val producto: String, val cantidad: String, val precio: String)
 
+// Función de vista previa para la pantalla de la lista de compras
 @Preview(showBackground = true)
 @Composable
 fun ListaCompraScreenPreview() {

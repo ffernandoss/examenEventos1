@@ -14,13 +14,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.exameneventos1.ui.theme.ExamenEventos1Theme
 
+// Actividad principal para el segundo ejercicio del examen
 class Ejercicio2MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ExamenEventos1Theme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    // Llama a la función composable para la pantalla del ejercicio 2
                     Exercise2Screen(modifier = Modifier.padding(innerPadding)) {
+                        // Inicia la actividad ListaCompraActivity al hacer clic en el botón
                         val intent = Intent(this, ListaCompraActivity::class.java)
                         startActivity(intent)
                     }
@@ -30,6 +33,7 @@ class Ejercicio2MainActivity : ComponentActivity() {
     }
 }
 
+// Función composable para la pantalla del ejercicio 2
 @Composable
 fun Exercise2Screen(modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
     Column(
@@ -38,18 +42,22 @@ fun Exercise2Screen(modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
             .padding(16.dp),
         verticalArrangement = Arrangement.Center
     ) {
+        // Texto de bienvenida
         Text(text = "Bienvenido al segundo ejercicio del examen")
         Spacer(modifier = Modifier.height(16.dp))
+        // Botón que ejecuta la acción del segundo ejercicio
         Button(onClick = onButtonClick) {
             Text(text = "Acción del segundo ejercicio")
         }
     }
 }
 
+// Función de vista previa para la pantalla del ejercicio 2
 @Preview(showBackground = true)
 @Composable
 fun Exercise2ScreenPreview() {
     ExamenEventos1Theme {
+        // Vista previa de la pantalla del ejercicio 2
         Exercise2Screen(onButtonClick = {})
     }
 }
