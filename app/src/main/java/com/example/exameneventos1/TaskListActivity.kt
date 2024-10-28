@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,18 +36,15 @@ class TaskListActivity : ComponentActivity() {
 fun TaskListScreen(modifier: Modifier = Modifier) {
     var taskName by remember { mutableStateOf("") }
     var tareasPendientes by remember { mutableStateOf(listOf<String>()) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var taskToDelete by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
+    var tareasHechas by remember { mutableStateOf(listOf<String>()) }
+    var selectedTask by remember { mutableStateOf<String?>(null) }
+    var selectedDoneTask by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Button(onClick = { showDeleteDialog = true }) {
-            Text(text = "Eliminar tarea")
-        }
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
             if (taskName.isNotBlank()) {
@@ -63,52 +62,73 @@ fun TaskListScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Lista de tareas", fontWeight = FontWeight.Bold)
+        Text(text = "Lista de tareas pendientes", fontWeight = FontWeight.Bold)
         LazyColumn {
             items(tareasPendientes) { tarea ->
-                Text(text = tarea, modifier = Modifier.padding(8.dp))
-            }
-        }
-        if (showDeleteDialog) {
-            AlertDialog(
-                onDismissRequest = { showDeleteDialog = false },
-                title = { Text(text = "Eliminar tarea") },
-                text = {
-                    Column {
-                        TextField(
-                            value = taskToDelete,
-                            onValueChange = { taskToDelete = it },
-                            label = { Text("Introduce el nombre de la tarea a borrar") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        if (errorMessage.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(text = errorMessage, color = Color.Red)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .clickable {
+                            selectedTask = if (selectedTask == tarea) null else tarea
                         }
-                    }
-                },
-                confirmButton = {
-                    Button(onClick = {
-                        if (taskToDelete.isNotBlank()) {
-                            if (tareasPendientes.contains(taskToDelete)) {
-                                tareasPendientes = tareasPendientes - taskToDelete
-                                taskToDelete = ""
-                                errorMessage = ""
-                                showDeleteDialog = false
-                            } else {
-                                errorMessage = "No se encontró la tarea"
-                            }
+                ) {
+                    Text(text = tarea, modifier = Modifier.weight(1f))
+                    if (selectedTask == tarea) {
+                        Button(onClick = {
+                            tareasPendientes = tareasPendientes - tarea
+                            tareasHechas = tareasHechas + tarea
+                            selectedTask = null
+                        }) {
+                            Text("Hecha")
                         }
-                    }) {
-                        Text("Eliminar")
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = { showDeleteDialog = false }) {
-                        Text("Cancelar")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(onClick = {
+                            tareasPendientes = tareasPendientes - tarea
+                            selectedTask = null
+                        }) {
+                            Text("Borrar")
+                        }
                     }
                 }
-            )
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(text = "Lista de tareas hechas", fontWeight = FontWeight.Bold)
+        LazyColumn {
+            items(tareasHechas) { tarea ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .clickable {
+                            selectedDoneTask = if (selectedDoneTask == tarea) null else tarea
+                        }
+                ) {
+                    Text(
+                        text = tarea,
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(Color.Green)
+                    )
+                    if (selectedDoneTask == tarea) {
+                        Button(onClick = {
+                            tareasHechas = tareasHechas - tarea
+                            tareasPendientes = tareasPendientes + tarea
+                            selectedDoneTask = null
+                        }) {
+                            Text("Deshacer")
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(onClick = {
+                            tareasHechas = tareasHechas - tarea
+                            selectedDoneTask = null
+                        }) {
+                            Text("Borrar")
+                        }
+                    }
+                }
+            }
         }
     }
 }
