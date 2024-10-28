@@ -51,6 +51,9 @@ android {
 
 dependencies {
 implementation("com.google.code.gson:gson:2.8.8")
+   
+        implementation("androidx.compose.material:material-icons-extended:1.5.1")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

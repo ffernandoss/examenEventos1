@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -18,13 +20,18 @@ import com.example.exameneventos1.ui.theme.ExamenEventos1Theme
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.Calendar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Delete
 
 data class Tarea(
     val nombre: String,
     val descripcion: String,
     val fecha: String,
     val coste: Double,
-    val prioridad: Boolean
+    val prioridad: Boolean,
+    val hecha: Boolean = false,
+    val favorita: Boolean = false
 )
 
 class TareasEjercicio3Activity : ComponentActivity() {
@@ -32,10 +39,9 @@ class TareasEjercicio3Activity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ExamenEventos1Theme {
-                TareasEjercicio3Screen(onShowTasksClick = { listaTareas ->
+                TareasEjercicio3Screen(onShowTasksClick = { tareas ->
                     val intent = Intent(this, MostrarTareasActivity::class.java)
-                    val nombresTareas = listaTareas.map { it.nombre }
-                    intent.putStringArrayListExtra("NOMBRES_TAREAS", ArrayList(nombresTareas))
+                    intent.putStringArrayListExtra("NOMBRES_TAREAS", ArrayList(tareas.map { it.nombre }))
                     startActivity(intent)
                 })
             }
@@ -50,7 +56,6 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
     var fecha by remember { mutableStateOf("") }
     var coste by remember { mutableStateOf("") }
     var prioridad by remember { mutableStateOf(false) }
-    var nombreABorrar by remember { mutableStateOf("") }
     val context = LocalContext.current
     val listaTareas = remember { mutableStateOf(loadTareas(context)) }
     var showToast by remember { mutableStateOf(false) }
@@ -98,15 +103,18 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Row(
+        TextField(
+            value = fecha,
+            onValueChange = { fecha = it },
+            label = { Text("Fecha") },
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("Fecha: $fecha")
-            Button(onClick = { datePickerDialog.show() }) {
-                Text("Seleccionar Fecha")
+            readOnly = true,
+            trailingIcon = {
+                IconButton(onClick = { datePickerDialog.show() }) {
+                    Icon(Icons.Default.CalendarToday, contentDescription = "Select date")
+                }
             }
-        }
+        )
         Spacer(modifier = Modifier.height(8.dp))
         TextField(
             value = coste,
@@ -127,74 +135,33 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
-            when {
-                nombre.isBlank() -> {
-                    toastMessage = "El campo de nombre es obligatorio"
-                    showToast = true
-                }
-                descripcion.isBlank() -> {
-                    toastMessage = "El campo de descripción es obligatorio"
-                    showToast = true
-                }
-                fecha.isBlank() -> {
-                    toastMessage = "El campo de fecha es obligatorio"
-                    showToast = true
-                }
-                coste.isBlank() -> {
-                    toastMessage = "El campo de coste es obligatorio"
-                    showToast = true
-                }
-                !isNumeric(coste) -> {
-                    toastMessage = "El campo de coste debe ser un número"
-                    showToast = true
-                }
-                listaTareas.value.any { it.nombre == nombre } -> {
-                    toastMessage = "Ya existe una tarea con ese nombre"
-                    showToast = true
-                }
-                else -> {
-                    val nuevaTarea = Tarea(nombre, descripcion, fecha, coste.toDouble(), prioridad)
-                    listaTareas.value = listaTareas.value + nuevaTarea
-                    saveTareas(context, listaTareas.value)
-                    nombre = ""
-                    descripcion = ""
-                    fecha = ""
-                    coste = ""
-                    prioridad = false
-                }
-            }
-        }) {
-            Text("Añadir")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        TextField(
-            value = nombreABorrar,
-            onValueChange = { nombreABorrar = it },
-            label = { Text("Nombre de la tarea a borrar") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = {
-            val tareaABorrar = listaTareas.value.find { it.nombre == nombreABorrar }
-            if (tareaABorrar != null) {
-                listaTareas.value = listaTareas.value - tareaABorrar
-                saveTareas(context, listaTareas.value)
-                toastMessage = "Tarea borrada"
+            if (nombre.isBlank() || descripcion.isBlank() || fecha.isBlank() || coste.isBlank() || !isNumeric(coste)) {
+                toastMessage = "Todos los campos son obligatorios y el coste debe ser numérico"
+                showToast = true
+            } else if (listaTareas.value.any { it.nombre == nombre }) {
+                toastMessage = "Ya existe una tarea con ese nombre"
+                showToast = true
             } else {
-                toastMessage = "No se encontró la tarea"
+                val nuevaTarea = Tarea(nombre, descripcion, fecha, coste.toDouble(), prioridad)
+                listaTareas.value = listaTareas.value + nuevaTarea
+                saveTareas(context, listaTareas.value)
+                nombre = ""
+                descripcion = ""
+                fecha = ""
+                coste = ""
+                prioridad = false
+                toastMessage = "Tarea añadida"
+                showToast = true
             }
-            showToast = true
-            nombreABorrar = ""
         }) {
-            Text("Borrar tarea")
+            Text("Añadir tarea")
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = { onShowTasksClick(listaTareas.value) }) {
-            Text("Mostrar todas las tareas")
+            Text("Mostrar tareas")
         }
     }
 }
-
 fun saveTareas(context: android.content.Context, listaTareas: List<Tarea>) {
     val sharedPreferences = context.getSharedPreferences("TareasPrefs", android.content.Context.MODE_PRIVATE)
     val editor = sharedPreferences.edit()
