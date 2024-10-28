@@ -28,6 +28,7 @@ class MostrarTareasActivity : ComponentActivity() {
             var showDoneTasks by remember { mutableStateOf(false) }
             var selectedTask by remember { mutableStateOf<Tarea?>(null) }
             var tareas by remember { mutableStateOf(listaTareas) }
+            var taskToDelete by remember { mutableStateOf("") }
 
             ExamenEventos1Theme {
                 MostrarTareasScreen(
@@ -35,6 +36,7 @@ class MostrarTareasActivity : ComponentActivity() {
                     listaTareas = tareas,
                     showDoneTasks = showDoneTasks,
                     selectedTask = selectedTask,
+                    taskToDelete = taskToDelete,
                     onBackClick = {
                         finish()
                     },
@@ -64,6 +66,26 @@ class MostrarTareasActivity : ComponentActivity() {
                             putExtra("PRIORIDAD_TAREA", tarea.prioridad)
                         }
                         startActivity(intent)
+                    },
+                    onDeleteTask = { tarea ->
+                        val updatedList = tareas.toMutableList().apply {
+                            remove(tarea)
+                        }
+                        saveTareas(this@MostrarTareasActivity, updatedList)
+                        tareas = updatedList
+                        selectedTask = null
+                    },
+                    onTaskToDeleteChange = { taskToDelete = it },
+                    onDeleteTaskByName = {
+                        val tarea = tareas.find { it.nombre == taskToDelete }
+                        if (tarea != null) {
+                            val updatedList = tareas.toMutableList().apply {
+                                remove(tarea)
+                            }
+                            saveTareas(this@MostrarTareasActivity, updatedList)
+                            tareas = updatedList
+                            taskToDelete = ""
+                        }
                     }
                 )
             }
@@ -77,11 +99,15 @@ fun MostrarTareasScreen(
     listaTareas: List<Tarea>,
     showDoneTasks: Boolean,
     selectedTask: Tarea?,
+    taskToDelete: String,
     onBackClick: () -> Unit,
     onTaskClick: (Tarea) -> Unit,
     onToggleShowDoneTasks: () -> Unit,
     onMarkDone: (Tarea) -> Unit,
-    onShowData: (Tarea) -> Unit
+    onShowData: (Tarea) -> Unit,
+    onDeleteTask: (Tarea) -> Unit,
+    onTaskToDeleteChange: (String) -> Unit,
+    onDeleteTaskByName: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -95,6 +121,17 @@ fun MostrarTareasScreen(
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onToggleShowDoneTasks) {
             Text("Mostrar/ocultar tareas hechas")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        TextField(
+            value = taskToDelete,
+            onValueChange = onTaskToDeleteChange,
+            label = { Text("Nombre de la tarea a eliminar") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = onDeleteTaskByName) {
+            Text("Eliminar tarea")
         }
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn {
@@ -126,6 +163,7 @@ fun MostrarTareasScreen(
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun MostrarTareasScreenPreview() {
@@ -138,11 +176,15 @@ fun MostrarTareasScreenPreview() {
             ),
             showDoneTasks = false,
             selectedTask = null,
+            taskToDelete = "",
             onBackClick = {},
             onTaskClick = {},
             onToggleShowDoneTasks = {},
             onMarkDone = {},
-            onShowData = {}
+            onShowData = {},
+            onDeleteTask = {},
+            onTaskToDeleteChange = {},
+            onDeleteTaskByName = {}
         )
     }
 }
