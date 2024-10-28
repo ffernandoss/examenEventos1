@@ -1,3 +1,15 @@
 <resources>
-    <string name="app_name">examenEventos1</string>
+    <string name="app_name">ExamenEventos1</string>
+    <string name="welcome_message">Bienvenido al primer ejercicio del examen</string>
+    <string name="go_to_task_list">Ir a lista de tareas</string>
+    <string name="select_language">Seleccionar idioma: Inglés</string>
+    <string name="add_task">Añadir tarea</string>
+    <string name="task_name">Nombre de la tarea</string>
+    <string name="pending">Pendientes</string>
+    <string name="done">Hechas</string>
+    <string name="pending_tasks_list">Lista de tareas pendientes</string>
+    <string name="done_tasks_list">Lista de tareas hechas</string>
+    <string name="done_button">Hecha</string>
+    <string name="delete_button">Borrar</string>
+    <string name="undo_button">Deshacer</string>
 </resources>

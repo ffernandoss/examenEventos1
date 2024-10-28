@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">ExamenEventos1</string>
+    <string name="welcome_message">Welcome to the first exam exercise</string>
+    <string name="go_to_task_list">Go to task list</string>
+    <string name="select_language">Select Language: Spanish</string>
+    <string name="add_task">Add task</string>
+    <string name="task_name">Task name</string>
+    <string name="pending">Pending</string>
+    <string name="done">Done</string>
+    <string name="pending_tasks_list">Pending tasks list</string>
+    <string name="done_tasks_list">Done tasks list</string>
+    <string name="done_button">Done</string>
+    <string name="delete_button">Delete</string>
+    <string name="undo_button">Undo</string>
+</resources>
