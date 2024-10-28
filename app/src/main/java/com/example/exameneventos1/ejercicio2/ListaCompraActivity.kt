@@ -36,12 +36,22 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
     var listaCompra by remember { mutableStateOf(listOf<Producto>()) }
     val context = LocalContext.current
     var showToast by remember { mutableStateOf(false) }
+    var toastMessage by remember { mutableStateOf("") }
 
     if (showToast) {
         LaunchedEffect(Unit) {
-            Toast.makeText(context, "El campo de producto es obligatorio", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
             showToast = false
         }
+    }
+
+    fun isNumeric(value: String): Boolean {
+        return value.toDoubleOrNull() != null
+    }
+
+    fun calcularPrecioTotal(): Double {
+        return listaCompra.filter { it.precio.isNotBlank() }
+            .sumOf { (it.cantidad.ifBlank { "1" }.toDouble()) * it.precio.toDouble() }
     }
 
     Column(
@@ -72,14 +82,26 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
-            if (producto.isBlank()) {
-                showToast = true
-            } else {
-                val nuevoProducto = Producto(producto, cantidad, precio)
-                listaCompra = listaCompra + nuevoProducto
-                producto = ""
-                cantidad = ""
-                precio = ""
+            when {
+                producto.isBlank() -> {
+                    toastMessage = "El campo de producto es obligatorio"
+                    showToast = true
+                }
+                cantidad.isNotBlank() && !isNumeric(cantidad) -> {
+                    toastMessage = "El campo de cantidad debe ser un número"
+                    showToast = true
+                }
+                precio.isNotBlank() && !isNumeric(precio) -> {
+                    toastMessage = "El campo de precio debe ser un número"
+                    showToast = true
+                }
+                else -> {
+                    val nuevoProducto = Producto(producto, cantidad, precio)
+                    listaCompra = listaCompra + nuevoProducto
+                    producto = ""
+                    cantidad = ""
+                    precio = ""
+                }
             }
         }) {
             Text("Añadir")
@@ -87,9 +109,11 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn {
             items(listaCompra) { item ->
-                Text(text = "${item.producto} - ${item.cantidad} - ${item.precio}")
+                Text(text = "${item.producto} - ${item.cantidad.ifBlank { "1" }} - ${item.precio}")
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(text = "Precio total: ${calcularPrecioTotal()}")
     }
 }
 
