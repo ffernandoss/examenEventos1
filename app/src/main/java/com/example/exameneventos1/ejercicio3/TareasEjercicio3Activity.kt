@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Delete
 
+// Clase de datos para representar una tarea
 data class Tarea(
     val nombre: String,
     val descripcion: String,
@@ -34,6 +35,7 @@ data class Tarea(
     val favorita: Boolean = false
 )
 
+// Actividad principal para gestionar las tareas del ejercicio 3
 class TareasEjercicio3Activity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +51,10 @@ class TareasEjercicio3Activity : ComponentActivity() {
     }
 }
 
+// Función composable para la pantalla de gestión de tareas
 @Composable
 fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (List<Tarea>) -> Unit) {
+    // Variables de estado para los campos de entrada y la lista de tareas
     var nombre by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var fecha by remember { mutableStateOf("") }
@@ -61,6 +65,7 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
     var showToast by remember { mutableStateOf(false) }
     var toastMessage by remember { mutableStateOf("") }
 
+    // Mostrar un Toast si showToast es verdadero
     if (showToast) {
         LaunchedEffect(Unit) {
             Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
@@ -68,10 +73,12 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
         }
     }
 
+    // Función para verificar si un valor es numérico
     fun isNumeric(value: String): Boolean {
         return value.toDoubleOrNull() != null
     }
 
+    // Configuración del DatePickerDialog para seleccionar la fecha
     val calendar = Calendar.getInstance()
     val datePickerDialog = DatePickerDialog(
         context,
@@ -83,12 +90,14 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
         calendar.get(Calendar.DAY_OF_MONTH)
     )
 
+    // Estructura de la interfaz de usuario
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Top
     ) {
+        // Campo de texto para el nombre de la tarea
         TextField(
             value = nombre,
             onValueChange = { nombre = it },
@@ -96,6 +105,7 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
+        // Campo de texto para la descripción de la tarea
         TextField(
             value = descripcion,
             onValueChange = { descripcion = it },
@@ -103,6 +113,7 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
+        // Campo de texto para la fecha de la tarea
         TextField(
             value = fecha,
             onValueChange = { fecha = it },
@@ -116,6 +127,7 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
             }
         )
         Spacer(modifier = Modifier.height(8.dp))
+        // Campo de texto para el coste de la tarea
         TextField(
             value = coste,
             onValueChange = { coste = it },
@@ -123,6 +135,7 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
+        // Switch para indicar si la tarea tiene prioridad
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -134,6 +147,7 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
+        // Botón para añadir una nueva tarea
         Button(onClick = {
             if (nombre.isBlank() || descripcion.isBlank() || fecha.isBlank() || coste.isBlank() || !isNumeric(coste)) {
                 toastMessage = "Todos los campos son obligatorios y el coste debe ser numérico"
@@ -157,11 +171,14 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
             Text("Añadir tarea")
         }
         Spacer(modifier = Modifier.height(16.dp))
+        // Botón para mostrar la lista de tareas
         Button(onClick = { onShowTasksClick(listaTareas.value) }) {
             Text("Mostrar tareas")
         }
     }
 }
+
+// Función para guardar la lista de tareas en SharedPreferences
 fun saveTareas(context: android.content.Context, listaTareas: List<Tarea>) {
     val sharedPreferences = context.getSharedPreferences("TareasPrefs", android.content.Context.MODE_PRIVATE)
     val editor = sharedPreferences.edit()
@@ -171,6 +188,7 @@ fun saveTareas(context: android.content.Context, listaTareas: List<Tarea>) {
     editor.apply()
 }
 
+// Función para cargar la lista de tareas desde SharedPreferences
 fun loadTareas(context: android.content.Context): List<Tarea> {
     val sharedPreferences = context.getSharedPreferences("TareasPrefs", android.content.Context.MODE_PRIVATE)
     val gson = Gson()
@@ -179,6 +197,7 @@ fun loadTareas(context: android.content.Context): List<Tarea> {
     return if (json != null) gson.fromJson(json, type) else listOf()
 }
 
+// Función de vista previa para la pantalla de gestión de tareas
 @Preview(showBackground = true)
 @Composable
 fun TareasEjercicio3ScreenPreview() {

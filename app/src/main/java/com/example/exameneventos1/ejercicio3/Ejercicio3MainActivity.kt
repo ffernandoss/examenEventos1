@@ -2,8 +2,6 @@ package com.example.exameneventos1.ejercicio3
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
-
-
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -20,8 +18,10 @@ import com.example.exameneventos1.ui.theme.ExamenEventos1Theme
 class Ejercicio3MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Establece el contenido de la actividad usando Jetpack Compose
         setContent {
             ExamenEventos1Theme {
+                // Usa un Scaffold para proporcionar una estructura básica de la pantalla
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     // Llama a la función composable para la pantalla del ejercicio 3
                     Exercise3Screen(modifier = Modifier.padding(innerPadding)) {
@@ -38,6 +38,7 @@ class Ejercicio3MainActivity : ComponentActivity() {
 // Función composable para la pantalla del ejercicio 3
 @Composable
 fun Exercise3Screen(modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
+    // Estructura de la interfaz de usuario usando una columna
     Column(
         modifier = modifier
             .fillMaxSize()
