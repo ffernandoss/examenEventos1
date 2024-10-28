@@ -1,3 +1,4 @@
+// TareasEjercicio3Activity.kt
 package com.example.exameneventos1.ejercicio3
 
 import android.app.DatePickerDialog
@@ -49,6 +50,7 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
     var fecha by remember { mutableStateOf("") }
     var coste by remember { mutableStateOf("") }
     var prioridad by remember { mutableStateOf(false) }
+    var nombreABorrar by remember { mutableStateOf("") }
     val context = LocalContext.current
     val listaTareas = remember { mutableStateOf(loadTareas(context)) }
     var showToast by remember { mutableStateOf(false) }
@@ -146,6 +148,10 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
                     toastMessage = "El campo de coste debe ser un número"
                     showToast = true
                 }
+                listaTareas.value.any { it.nombre == nombre } -> {
+                    toastMessage = "Ya existe una tarea con ese nombre"
+                    showToast = true
+                }
                 else -> {
                     val nuevaTarea = Tarea(nombre, descripcion, fecha, coste.toDouble(), prioridad)
                     listaTareas.value = listaTareas.value + nuevaTarea
@@ -159,6 +165,28 @@ fun TareasEjercicio3Screen(modifier: Modifier = Modifier, onShowTasksClick: (Lis
             }
         }) {
             Text("Añadir")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        TextField(
+            value = nombreABorrar,
+            onValueChange = { nombreABorrar = it },
+            label = { Text("Nombre de la tarea a borrar") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = {
+            val tareaABorrar = listaTareas.value.find { it.nombre == nombreABorrar }
+            if (tareaABorrar != null) {
+                listaTareas.value = listaTareas.value - tareaABorrar
+                saveTareas(context, listaTareas.value)
+                toastMessage = "Tarea borrada"
+            } else {
+                toastMessage = "No se encontró la tarea"
+            }
+            showToast = true
+            nombreABorrar = ""
+        }) {
+            Text("Borrar tarea")
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = { onShowTasksClick(listaTareas.value) }) {
