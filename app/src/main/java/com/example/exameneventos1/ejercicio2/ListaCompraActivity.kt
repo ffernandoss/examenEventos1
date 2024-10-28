@@ -33,6 +33,7 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
     var producto by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
     var precio by remember { mutableStateOf("") }
+    var productoAEliminar by remember { mutableStateOf("") }
     var listaCompra by remember { mutableStateOf(listOf<Producto>()) }
     val context = LocalContext.current
     var showToast by remember { mutableStateOf(false) }
@@ -95,6 +96,10 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
                     toastMessage = "El campo de precio debe ser un número"
                     showToast = true
                 }
+                listaCompra.any { it.producto == producto } -> {
+                    toastMessage = "El producto ya está en la lista"
+                    showToast = true
+                }
                 else -> {
                     val nuevoProducto = Producto(producto, cantidad, precio)
                     listaCompra = listaCompra + nuevoProducto
@@ -105,6 +110,27 @@ fun ListaCompraScreen(modifier: Modifier = Modifier) {
             }
         }) {
             Text("Añadir")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        TextField(
+            value = productoAEliminar,
+            onValueChange = { productoAEliminar = it },
+            label = { Text("Producto a eliminar") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = {
+            val productoEncontrado = listaCompra.find { it.producto == productoAEliminar }
+            if (productoEncontrado != null) {
+                listaCompra = listaCompra - productoEncontrado
+                toastMessage = "Producto eliminado"
+            } else {
+                toastMessage = "No se ha encontrado el producto"
+            }
+            showToast = true
+            productoAEliminar = ""
+        }) {
+            Text("Eliminar")
         }
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn {
